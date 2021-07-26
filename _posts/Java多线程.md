@@ -1,4 +1,4 @@
-@[TOC](目录)
+﻿@[TOC](目录)
 # 并发与并行+2
 1. 并发指多个程序在同一时间段运行，并行指多个程序在同一时刻运行；
 2. 单CPU系统中运行多个程序，给人感觉是同时运行，其实微观上是分时的交替运行，即并发；在多 CPU系统中，这些并发程序可以分配到多个CPU上，实现并行；
@@ -267,6 +267,49 @@ Java的Atomic原子类都放在`java.util.concurrent.atomic`包下
 2. 由于 CAS 设计机制就是获取某两个时刻(初始预期值和当前内存值)变量值，并进行比较更新，所以说如果在获取初始预期值和当前内存值这段时间间隔内，变量值由 A 变为 B 再变为 A，那么对于 CAS 来说是不可感知的，但实际上变量已经发生了变化（即ABA问题）。解决办法是在每次获取时加版本号，并且每次更新对版本号 +1，这样当发生 ABA 问题时通过版本号可以得知变量被改动过；
 
 ## AQS
+1. AQS（Abstract Queued Synchronized，抽象的队列同步器），定义了一套多线程访问共享资源的同步器框架，许多同步类实现都依赖于它，如常用的ReentrantLock、ReentrantReadWriteLock、Semaphore、CountDownLatch等；
+2. AQS维护了一个volatile int state（代表共享资源）和一个CLH队列（FIFO，多线程争用资源被阻塞时会进入此队列）；
+3. AQS核心思想是：如果被请求的共享资源空闲，则将当前请求资源的线程设置为有效的工作线程，并且将共享资源设置为锁定状态；如果被请求的共享资源被占用，那么就需要⼀套线程阻塞等待以及被唤醒时锁分配的机制，这个机制是⽤CLH队列锁实现的，即将暂时获取不到锁的线程加⼊到队列中；
+
+> CLH(Craig,Landin,and Hagersten)队列是⼀个虚拟的双向队列（虚拟的双向队列即不存在队列实例，仅存在结点之间的关联关系）。AQS是将每条请求共享资源的线程封装成⼀个CLH锁队列的⼀个结点（Node）来实现锁的分配。
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/bf185356bbe8434dbfd20a9119c2c991.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3NjMTc5,size_16,color_FFFFFF,t_70)
+
+4. AQS使用state来表示同步状态并使⽤CAS对state进⾏更新，通过内置的FIFO队列来完成获取资源线程的排队⼯作；
+5. AQS定义两种资源共享方式：1 Exclusive（独占，只有一个线程能执行，如ReentrantLock。⼜可分为公平锁和⾮公平锁：公平锁：按照线程在队列中的排队顺序，先到者先拿到锁；非公平锁：当线程要获取锁时，无视队列顺序直接去抢锁，谁抢到就是谁的）；2 Share（共享，多个线程可同时执行，如Semaphore、CountDownLatch）；3 ReentrantReadWriteLock 可以看成是组合式；
+6. 不同的自定义同步器争用共享资源的方式也不同，自定义同步器在实现时只需要实现共享资源state的获取与释放方式即可，至于具体线程等待队列的维护（如获取资源失败入队/唤醒出队等），AQS已经在顶层实现好了；
+
+```java
+private volatile int state;//共享变量，使⽤volatile修饰保证可⻅性
+
+//返回同步状态的当前值
+protected final int getState() { 
+	return state;
+}
+// 设置同步状态的值
+protected final void setState(int newState) {
+	state = newState;
+}
+//原⼦地（CAS操作）将同步状态值设置为给定值update（如果当前同步状态的值等于期望值）
+protected final boolean compareAndSetState(int expect, int update) {
+	return unsafe.compareAndSwapInt(this, stateOffset, expect, update);
+}
+```
+7. ⾃定义同步器时需要重写下⾯几个AQS提供的模板⽅法：
+
+```java
+protected boolean tryAcquire(int arg)：独占式获取同步状态，试着获取，成功返回true，反之为false
+
+protected boolean tryRelease(int arg)：独占式释放同步状态，等待中的其他线程此时将有机会获取到同步状态
+
+protected int tryAcquireShared(int arg)：共享式获取同步状态，返回值大于等于0，代表获取成功；反之获取失败
+
+protected boolean tryReleaseShared(int arg)：共享式释放同步状态，成功为true，失败为false
+
+protected boolean isHeldExclusively()：是否在独占模式下被线程占用。
+```
+
+- 以ReentrantLock为例，state初始化为0，表示未锁定状态。A线程lock()时，会调⽤tryAcquire()独占该锁并将state+1。此后，其他线程再tryAcquire()时就会失败，直到A线程unlock()到state=0（即释放锁）为⽌，其它线程才有机会获取该锁。释放锁之前A线程自己是可以重复获取此锁（state会累加），即可重⼊。但要注意，获取多少次就要释放多少次，这样才能保证state 能回到零态；
 
 # synchronized+2
 1. synchronized用于为方法、代码块提供线程安全；
@@ -517,4 +560,5 @@ public synchronized StringBuffer append(String str) {
 
 ## 一张图总结Java各种锁+1
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210628141225953.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3NjMTc5,size_16,color_FFFFFF,t_70)
+
 
