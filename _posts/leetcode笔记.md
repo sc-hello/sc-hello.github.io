@@ -53,8 +53,20 @@ String s = stringBuilder.toString();
 
 ## 字符串比较大小
 
+
 ```java
-str1.compareTo(str2);
+// public boolean equals(Object anObject)：字符序列相等返回true，否则false
+boolean judge = str1.equals(str2);
+```
+
+```java
+// public boolean equalsIgnoreCase(String anotherString)：忽略大小写字符序列相等返回true，否则false
+boolean judge = str1.equalsIgnoreCase(str2);
+```
+
+```java
+// public int compareTo(String anotherString)：按字典顺序比较两个字符串，如果String对象按字典顺序排列在参数字符串之前，结果为负整数，如果在之后结果为正整数；如果两字符串相等，结果为0
+int judge = str1.compareTo(str2);
 ```
 
 ## 测试字符串是否以指定前缀开头/后缀结尾
@@ -68,6 +80,13 @@ public boolean startsWith(String prefix, int toffset)
 public boolean endsWith(String suffix)
 ```
 
+## 返回指定字符在字符串中第一次出现的索引
+
+```java
+int indexOf(String str): 返回指定字符在字符串中第一次出现处的索引，如果此字符串中没有这样的字符，则返回-1。
+
+int indexOf(String str, int fromIndex): 返回从 fromIndex 位置开始查找指定字符在字符串中第一次出现处的索引，如果此字符串中没有这样的字符，则返回-1。
+```
 
 # StringBuilder
 ## StringBuider删除对应索引位置的元素
@@ -302,14 +321,26 @@ List<T> list = new ArrayList<>(set);
 
 ## List尾加元素和头加元素
 
- - 尾加：`list.addLast(t);`
- - 头加：`list.addFirst(t);`
+ - 尾加：`list.add(t);`
+ - 头加：`list.add(0, t);`
 
 ## 交换指定List中指定位置的元素
 
 ```java
 Collections.swap(List<?> list, int i, int j);
 ```
+
+## String是否包含指定的char序列
+
+```java
+String string = "aba";
+System.out.println(string.contains("ba"));
+```
+
+```java
+true
+```
+
 # List和Array转换
 ## List转Array
 **1 引用数据类型**
@@ -335,12 +366,12 @@ List<String> list = new ArrayList<>(Arrays.asList(array));
  - 基本类型Array转List只能先定义List再循环赋值。
 
 ## 增强for循环
-增强for循环专门用来遍历数组和Collection，它的内部原理其实是个Iterator迭代器，所以在遍历的过程中，不能对元素进行增删操作。
+增强for循环专门用来遍历Array和Collection，它的内部原理其实是个Iterator迭代器，所以在遍历的过程中，不能对元素进行增删操作。
 
 **格式**：
 
 ```java
-for(元素的数据类型  变量 : Collection或Array){ 
+for(元素的数据类型 变量 : Collection或Array){ 
   	//操作代码
 }
 ```
@@ -384,7 +415,7 @@ int i = Integer.parseInt(s)；
 ## 0，'0'，'\0'
 0表示整数,'0'表示0字符,'\0'表示ASCII码值为0的字符
 
-## Integer最大最小值表示，Double最大最小值表示，无穷大无穷小表示+0
+## Integer最大最小值表示，Double最大最小值表示，无穷大无穷小表示
 
  - Integer最大值：Integer.MAX_VALUE
  - Integer最小值：Integer.MIN_VALUE
@@ -462,7 +493,7 @@ public class BufferedReaderDemo {
       	 // 创建流对象
         BufferedReader br = new BufferedReader(new FileReader("in.txt"));
 		// 定义字符串,保存读取的一行文字
-        String line  = null;
+        String line = null;
       	// 循环读取,读取到最后返回null
         while ((line = br.readLine())!=null) {
             System.out.print(line);

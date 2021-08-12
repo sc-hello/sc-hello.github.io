@@ -1,45 +1,5 @@
 ﻿@[TOC](目录)
-# 1 Profile+1
-1. profile是用来完成不同环境下，配置动态切换功能的；
-2. profile配置方式：
-	2.1 多profile文件方式：提供多个配置文件，每个代表一种环境：
-		- application-dev.properties/yml开发环境
-		- application-test.properties/yml测试环境
-		- application-pro.properties/yml生产环境
-	2.2 yml多文档方式：
-		- 在yml中使用 --- 分隔不同配置
-3. profile激活方式：
-	3.1 配置文件：在配置文件中配置：spring.profiles.active=dev
-	3.2 虚拟机参数：在VM aptions指定：-Dspring.profiles.active=dev
-	3.3 命令行参数：java-jar xxx.jar --spring.profiles.active=dev
-
-# 2 Spring Boot内部配置文件加载顺序+1
-Spring Boot程序启动时，会从以下位置加载配置文件：
-
- 1. file:./config/：当前目录下的/config目录
- 2. file:./：当前项目的根目录
- 3. classpath:/config/：classpath的/config目录
- 4. classpath:/：classpath的根目录
-
-加载顺序为以上的排列顺序，高优先级配置的属性会生效。
-
-# 3 Condition+1
-1. 自定义条件：
-	- 自定义条件类：自定义条件类实现Condition接口，重写matches方法，在matches方法中进行逻辑判断，返回boolean值。matches方法有两个参数：
-	
-		- context：上下文对象，可以获取属性值，获取类加载器，获取BeanFactory等；
-		- metadata：元数据对象，用于获取注解属性；
-		
-	- 判断条件：初始化Bean时，使用@Conditional(条件类.class)注解；
-
-2. Spring Boot提供的常用条件注解：
-
-	- ConditionalOnProperty：判断配置文件中是否有对应属性和值才初始化Bean；
-	- ConditonalOnClass：判断环境中是否有对应字节码文件才初始化Bean；
-	- ConditionalOnMissingBean：判断环境中没有对应Bean才初始化Bean；
-
-
-# 5 Maven下各种包的含义+1
+# Maven下各种包的含义
 1. Config：用于存放相关配置类，包括启动类；
 2. Controller：所有请求的入口，前后端交互的入口；
 3. Service：负责所有的业务逻辑；
@@ -49,7 +9,7 @@ Spring Boot程序启动时，会从以下位置加载配置文件：
 7. Domain类的属性完全和表的字段一致；Dto类的属性一般和表字段一致，但会根据不同的业务场景适当增加或减少属性；
 8. Domain用于Java数据和数据库表记录的映射，用在Service和Mapper；Dto用于前后端数据传输，用在Service和Controller；Service介于Controller和Mapper之间，也是Domain和Dto的转换层；
 
-# 6 Idea快捷键+1
+# Idea快捷键
 
  - Ctrl + F：当前文件查找
  - Ctrl + R：当前文件替换
@@ -60,17 +20,17 @@ Spring Boot程序启动时，会从以下位置加载配置文件：
  - 连按两次Shift：查找文件、菜单、操作等，但不能查找文件内容
  - 复制历史：Ctrl+Shift+V
 
-# 什么是Spring框架+1
-1. 是一种轻量级开发框架，旨在提高开发人员的开发效率和系统的可维护性；
-2. 是很多模块的集合，使用这些模块可以很方便地协助我们进行开发，这些模块包括：核心容器、数据访问/集成、Web、AOP（面向切面编程）、工具、消息和测试模块；
-3. 核心技术：依赖注入（DI）、AOP、事件（events）、资源、i18n、验证、数据绑定、类型转换、SpEL;
-4. 测试 ：模拟对象，TestContext框架，Spring MVC 测试，WebTestClient;
-5. 数据访问 ：事务，DAO⽀持，JDBC，ORM，编组XML;
-6. Web⽀持 : Spring MVC和Spring WebFlux Web框架;
-7. 集成 ：远程处理，JMS，JCA，JMX，电⼦邮件，任务，调度，缓存;
+# Spring框架介绍
+1. 轻量级的J2EE框架，是一个控制反转（IoC）和面向切面（AOP）的容器框架，用来装JavaBean（Java对象）；
+2. 是一个中间层框架（万能胶），可以起到连接作用，比如把Struts和Hibernate粘合在一起运用，使企业开发更快更简洁；
+3. 从大小和开销两方面而言Spring都是轻量级的；
+4. 通过控制反转(IoC)达到松耦合的目的；
+5. 提供了面向切面编程的支持，允许通过分离应用的业务逻辑与系统级服务进行内聚性开发；
+6. 包含并管理应用对象（Bean）的配置和生命周期，这个意义上是一个容器；
+7. 将简单的组件配置组合称为复杂的应用，这个意义上是一个框架；
 
 
-# 列举⼀些重要的Spring模块+1
+# 列举⼀些重要的Spring模块
 
  - Spring Core： 核心，Spring 其他所有的功能都需要依赖于该类库，主要提供 IoC 依赖注⼊功能；
  - Spring Aspects： 该模块为与AspectJ的集成提供⽀持；
@@ -81,7 +41,7 @@ Spring Boot程序启动时，会从以下位置加载配置文件：
  - Spring Web : 为创建Web应⽤程序提供⽀持；
  - Spring Test : 提供了对 JUnit 和 TestNG 测试的⽀持；
 
-# @RestController 和 @Controller+1
+# @RestController 和 @Controller
 
  - Controller 返回⼀个⻚⾯：单独使⽤ @Controller 不加 @ResponseBody 的话⼀般使⽤在要返回⼀个视图的情况，这种情况属于比较传统的Spring MVC 的应⽤，对应于前后端不分离的情况；
 
@@ -91,12 +51,12 @@ Spring Boot程序启动时，会从以下位置加载配置文件：
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210625130724690.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3NjMTc5,size_16,color_FFFFFF,t_70)
 
-# 控制反转(IoC)和依赖注入(DI) +1
+# 控制反转(IoC)和依赖注入(DI) 
 1. 控制反转（IoC）与依赖注入（DI）含义相同，只不过是从两个角度描述同一个概念;
 2. **控制反转**：1 当某个Java对象需要调用另一个Java对象时，在传统模式下，调用者通常采用“new”的代码方式来创建对象；2 而在Spring框架下，对象的实例不再由调用者来创建，而是由Spring容器来创建；3 这样，控制权由应用代码转移到了Spring容器，控制权发生了反转，这就是Spring的控制反转；
 3. **依赖注入**：Spring容器负责将被依赖对象赋值给调用者的成员变量，这相当于为调用者注入了它依赖的实例，即依赖注入；
 
-# IoC+1
+# IoC
 1. IoC（控制反转）是⼀种设计思想，就是将原本在程序中⼿动创建对象的控制权，交由Spring框架来管理;
 2. IoC 容器是 Spring⽤来实现 IoC 的载体， IoC 容器实际上就是个Map（key，value），Map 中存放的是各种对象，将对象之间的相互依赖关系交给 IoC 容器来管理，并由 IoC 容器完成对象的注⼊，这样可以很⼤程度上简化应⽤的开发，把应⽤从复杂的依赖关系中解放出来；
 3.  IoC 容器就像是⼀个⼯⼚，当我们需要创建⼀个对象的时候，只需要配置好配置⽂件/注解即可，完全不⽤考虑对象是如何被创建出来的；
@@ -107,7 +67,7 @@ Spring Boot程序启动时，会从以下位置加载配置文件：
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210625131504444.png)
 
 
-# AOP+1
+# AOP
 
 1. AOP(⾯向切⾯编程)能够将那些与业务⽆关，却为业务模块所共同调⽤的逻辑或责任（例如事务处理、⽇志管理、权限控制等）封装起来，便于减少系统的重复代码，降低模块间的耦合度，并有利于未来的可拓展性和可维护性；
 2. Spring AOP是基于动态代理的，动态代理就是在运行时动态地生成目标对象的代理对象，在代理对象中对目标对象的方法进行增强；
@@ -159,7 +119,7 @@ public class MyAspectLog {
 4 当我们创建UserDao的对象userDao调用addUser方法的时候会打印“添加用户”，“记录日志”
 
 
-# Spring MVC+1
+# Spring MVC
 1. MVC 是⼀种设计模式，Spring MVC 是⼀款很优秀的 MVC 框架，可以帮助我们进⾏更简洁的Web层的开发，并且它天⽣与 Spring 框架集成；
 2. Spring MVC 下⼀般把后端项⽬分为 Controller层(控制层，返回数据给前台⻚⾯)、Service层（处理业务）、Dao层（数据库操作）、Entity层（实体类）；
 3. 
@@ -167,7 +127,7 @@ public class MyAspectLog {
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210626143943543.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3NjMTc5,size_16,color_FFFFFF,t_70)
 
 
-# Spring MVC 工作原理+1
+## Spring MVC 工作原理
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210626144508359.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3NjMTc5,size_16,color_FFFFFF,t_70)
 
@@ -180,4 +140,21 @@ public class MyAspectLog {
 7. DispaterServlet 把返回的 Model 传给 View （视图渲染）；
 8. 把 View 返回给请求者（浏览器）；
 
-# Spring 框架中⽤到了哪些设计模式？
+## Spring MVC涉及到的组件
+0. Spring MVC 涉及到的组件有 DispatcherServlet（前端控制器）、HandlerMapping（处理器映射器）、HandlerAdapter（处理器适配器）、Handler（处理器）、ViewResolver（视图解析器）和 View（视图）；
+1. DispatcherServlet 是前端控制器，Spring MVC 的所有请求都要经过 DispatcherServlet 来统一分发。DispatcherServlet 相当于一个转发器或中央处理器，控制整个流程的执行，对各个组件进行统一调度，以降低组件之间的耦合性，有利于组件之间的拓展；
+2. HandlerMapping 是处理器映射器，其作用是根据请求的 URL 路径，通过注解或者 XML 配置，寻找匹配处理器（Handler）信息；
+3. HandlerAdapter 是处理器适配器，其作用是根据映射器找到的处理器（Handler）信息，按照特定规则执行相关的处理器（Handler）；
+4. Handler 是处理器（即Controller），和 Java Servlet 扮演的角色一致。其作用是执行相关的请求处理逻辑，并返回相应的数据和视图信息，将其封装至 ModelAndView 对象中；
+5. View Resolver 是视图解析器，其作用是进行解析操作，通过 ModelAndView 对象中的 View 信息将逻辑视图名解析成真正的视图 View（如通过一个 JSP 路径返回一个真正的 JSP 页面）；
+6. View 是视图，其本身是一个接口，实现类支持不同的 View 类型（JSP、FreeMarker、Excel 等）。
+
+以上组件中，需要开发人员进行开发的是处理器（Handler，常称Controller）和视图（View）。通俗的说，要开发处理该请求的具体代码逻辑，以及最终展示给用户的界面。
+
+# 常用的SpringBoot注解，及其实现（未完，待续）
+1. @SpringBootApplication：标识了一个SpringBoot工程，实际上是另外3个注解的组合：
+	1. @SpringBootConfiguration：这个注解实际上就是一个@Configuration，表示启动类也是一个配置类；
+	2. @EnableAutoConfiguration：向Spring容器中导入了一个Selector，用来加载ClassPath下SpringFactories中定义的自动配置类，将这些自动加载为配置Bean；
+	3. @ComponentScan：标识扫描路径，因为默认没有配置实际扫描路径，所以Spring Boot扫描的路径是启动类所在的当前目录；
+
+2. @Bean注解：用来定义Bean，类似于XML中的`<bean>`标签，Spring在启动时，会对加了@Bean注解的方法进行解析，将方法的名字作为beanName，并通过执行方法得到bean对象；
