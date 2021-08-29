@@ -45,6 +45,11 @@
 # 抽象类和接口
 1. 相同点:1.1都不能被实例化1.2接口的实现类或抽象类的子类都只有重写了接口或抽象类中的抽象方法后才能被实例化；
 2. 不同点:2.1实现接口的关键字为implements，继承抽象类的关键字为extends 2.2一个类可以实现多个接口，但一个类只能继承一个抽象类，所以使用接口可以间接实现多继承2.3接口强调特定功能的实现(has-a)，而抽象类强调所属关系（is-a）2.4接口成员变量必须被public static final修饰，必须赋初值，不能被修改;抽象类中的成员变量可以是各种类型2.5接口没有构造方法;抽象类有构造方法，是供子类创建对象时，初始化父类成员使用的；
+
+## 什么时候用抽象类，什么时候用接口
+0.  分析对象提炼内部共性时形成抽象类，提供调用功能扩充功能时形成接口；
+1. 抽象类和其子类是是不是的关系（is-a）。例如：程序员和项目经理都是员工；
+2. 接口和其子类是有没有的关系(has-a)。例如：鸟和飞机都有飞的特性；
 # Java实例化对象时的初始化顺序
 1. 父类静态成员和静态初始化块，按在代码中出现的顺序依次执行；
 2. 子类静态成员和静态初始化块，按在代码中出现的顺序依次执行；
@@ -74,7 +79,7 @@
 2. 深克隆：克隆一个新对象，属性中引用的对象也会被克隆（递归性的），不再指向原有对象；
 3. 浅克隆实现：实现Cloneable接口、重写clone()方法（调用super.clone())；
 4. 深克隆实现：实现Cloneable和Serializable接口、重写clone()方法（通过对象的序列化和反序列化实现深克隆)；
-# 21 new Integer(123) 与 Integer.valueOf(123)有何区别，请从底层实现分析两者区别
+# new Integer(123) 与 Integer.valueOf(123)有何区别，请从底层实现分析两者区别
 1. new Integer(123)每次都会创建一个新对象；Integer.valueOf(123)会使用缓存池中的对象，多次调用会取得同一个对象的引用；
 2. Integer 缓存池的大小默认为 -128~127 ；
 3. 编译器会在自动装箱过程调用 valueOf() 方法，因此多个Integer实例使用自动装箱来创建并且值相同，就会引用相同的对象；
@@ -86,16 +91,8 @@
 1. JRE即Java运行环境，包括JVM和Java程序运行时所需要的类库；
 2. JDK即Java开发工具包，包含JRE和开发工具，例如编译工具(javac.exe)、打包工具(jar.exe)；
 3. 如果想要运行一个已有的Java程序，只需安装JRE即可，如果想要开发一个Java程序，必须安装JDK；
-# Servlet与JSP的区别
-1. Servlet是一个Java类，是在服务器上运行以处理客户端请求并作出响应的程序；
-2. JSP是一种动态页面技术，它的主要目的是将表示逻辑从Servlet中分离出来；
-3. SUN 公司推出 JSP 技术的同时，也推出了两种 Web 应用程序的开发模式。即 JSP+JavaBean 和 Servlet+JSP+JavaBean；
-4. JSP+JavaBean 中 JSP 用于处理用户请求，JavaBean 用于封装和处理数据。该模式只有视图和模型，一般把控制器的功能交给视图来实现，适合业务流程比较简单的 Web 程序。JSP+JavaBean 模式在一定程度上实现了 MVC，即 JSP 将控制层和视图层合二为一，JavaBean 为模型层；
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210720195340795.png)
-
-5. Servlet+JSP+JavaBean 中 Servlet 用于处理用户请求，JSP 用于数据显示，JavaBean 用于数据封装，适合复杂的 Web 程序。Servlet+JSP+JavaBean很好地实现了MVC，即Servlet担当控制层，JSP为视图层，JavaBean为模型层；
-
+```java
 # Java与C++的异同
  1. Java是纯粹面向对象语言，所有对象继承自java.lang.Object，C++为了兼容C既支持面向对象也支持面向过程；
  2. Java通过虚拟机实现跨平台特性，C++依赖于特定平台；
@@ -105,6 +102,8 @@
  6. Java不支持操作符重载，虽然可以对两个String对象执行加法运算，但这是语言内置支持的操作，不属于操作符重载，C++支持操作符重载；
  7. Java的goto是保留字，但是不可用，C++可以使用goto；
  8. Java不支持条件编译，C++可以通过#ifdef、#ifndef等预处理命令实现条件编译；
+```
+
 # Throwable体系
 1. **Error**：1 错误，程序无法处理的问题，比较严重；2 大多数错误与代码编写者执行的操作无关，而是代码运行时JVM出现的问题；3 例如，Java虚拟机运行错误，当JVM不再拥有继续执行操作所需的内存资源时，将出现OutOfMemoryError。4 这些错误发生时，JVM一般会选择终止线程；
 2. **Exception**：1 异常，程序可以处理的问题；2 Exception类有一个重要的子类RuntimeException，由JVM抛出，例如NullPointerException（要访问的变量没有引用任何对象时，抛出该异常）、ArithmeticException（算术运算异常，一个整数除以0时，抛出该异常）和ArrayIndexOutOfBoundsException（下标越界异常）；
@@ -145,29 +144,24 @@
 2. 当父类中存在有参构造时，默认的无参构造就不存在了，因此强烈建议同时显式提供无参构造，因为子类构造不会自动调用父类有参构造，如果没有调用父类有参构造，仍然默认调用父类无参构造，如果父类没有，就会出错；
 
 
+```java
 # Java程序的种类
 1. Application：Java应用程序，可以由Java解释器直接运行的程序；
 2. Applet：Java小程序，嵌入到Web页面中由Java兼容浏览器控制执行；
 3. Servlet：运行于Web Server上，作为客户端请求和服务器响应的中间层；
+```
 
 # Java中的String为什么不可变？不可变的好处？
-1. 不可变的原因；1.1String的主要成员变量char value[]被声明为private final；1.2String被声明为final class，是典型的Immutable类；
+1. 不可变的原因；1.1 String被声明为final class，是典型的Immutable类；1.2 String的主要成员变量char value[]被声明为private final；
 2. 不可变的好处：2.1可以缓存 hash 值：例如 String 用作 HashMap 的 key， 不可变性使得 hash 值也不可变，因此只需进行一次计算；2.2String Pool 的需要：只有 String 是不可变的，才能拥有 String Pool；2.3线程安全：String 不可变性天生具备线程安全2.4用作很多场景下的参数：例如在网络连接的过程中如果参数被改变，改变参数的那一方以为现在连接的是其它主机，而实际情况却不是，String可以保证参数不可变；
 
-# servlet生命周期
-1. 初始化阶段：调用构造方法创建Servlet实例，然后调用init()方法，在整个生命周期内，init()只被调用一次；
-2. 响应客户端请求阶段：调用service()方法。由service()方法根据提交方式选择执行doGet()或者doPost()方法；
-3. 终止阶段：服务器关闭时，调用destroy()方法。在调用 destroy() 方法之后，servlet 对象被标记为垃圾回收；
-![在这里插入图片描述](https://img-blog.csdnimg.cn/img_convert/b19f216cf2a923d1c375a2b40139e51a.png)
-
-
-# HashMap底层原理解析+001
+# HashMap底层原理解析
 1. 内部包含一个 Entry 类型的数组 table，Entry包含四个字段，分别是键、值、键的哈希值、以及下一个结点的引用next；
 2. 从next字段可以看出Entry是一个链表，即数组中的每个位置被当成一个桶，一个桶存放一个链表；
 3.  通过哈希算法将键的哈希值转换成桶下标，使用拉链法来解决哈希冲突，同一链表中存放键的哈希值相同的Entry；
 4. 数组table长度默认16，最大为2 ^ 30；
 5. 默认装载因子loadFactor为0.75，乘以数组长度capacity得到threshold，如果键值对数量大于threshold，数组扩容为原来的2倍，扩容后需重新计算每个元素的桶下标；
-6. 链表长度>8且数组容量>=64时，链表会转化为红黑树; 转化的过程：先遍历链表 ，将链表的节点转化为红黑树的节点，然后将链表转化为红黑树;红黑树中元素个数<=6就退化为链表；
+6. 链表长度>8且数组容量>=64时，链表会转化为红黑树；转化的过程：先遍历链表 ，将链表的节点转化为红黑树的节点，然后将链表转化为红黑树；红黑树中元素个数<=6就退化为链表；
 
 # HashMap和HashSet的区别
 1. HashMap实现了Map接口，HashSet实现了Set接口；
@@ -175,32 +169,32 @@
 3. HashMap调用put()添加元素，HashSet调用add()添加元素；
 4. HashMap使用键计算hashcode，HashSet使用成员对象计算hashcode ；
 
-# ConcurrentHashMap+001
+# ConcurrentHashMap
 1. ConcurrentHashMap和HashMap的实现方式类似，不同的是它采用分段锁的思想支持并发操作，因此是线程安全的；
 2. 如果为了线程安全对整个HashMap加锁，同一时间只能有一个线程可以操作HashMap，效率不高；而ConcurrentHashMap在内部细分为若干个小的HashMap，即Segment，默认16个，对每个Segment单独加锁，提高了并发度；
 3. 实现：3.1 ConcurrentHashMap内部包含了一个Segment数组，Segment和HashMap类似，是数组和链表结构；3.2 每个Segment包含并守护一个HashEntry数组，HashEntry是链表结构，在对HashEntry数组里的数据进行修改时，必须首先获得它对应的Segment锁；3.3 在操作ConcurrentHashMap时，如果需要在其中put一个新的数据，并不是将整个ConcurrentHashMap加锁，而是先根据hashcode查询该数据被存放在哪个Segment，然后对该Segment加锁并完成put操作；3.4 在多线程环境下，如果多个线程同时执行put操作，则只要加入的数据被存放在不同的Segment中，在线程间就可以做到并行的线程安全；
-# LinkedHashMap+001
+# LinkedHashMap
 1. 继承自 HashMap;
 2. 内部维护了一个双向链表，用来维护插入顺序或 LRU 顺序；
 3. accessOrder 决定顺序模式，默认false，维护的是插入顺序; 
-4. 如果 accessOrder 为 true，则为 LRU 顺序，在每次访问一个节点时，会将这个节点移到链表尾部，保证链表尾部是最近访问的节点，那么链表首部就是最近最久未访问的节点；
+4. 如果 accessOrder 为 true，则为 LRU 顺序，在每次访问一个节点时，会将这个节点移到链表尾部，保证链表尾部是最近访问的节点，那么链表首部就是最近最少访问的节点；
 5. afterNodeInsertion()在 put 等操作之后执行，当 removeEldestEntry() 方法返回 true 时会移除最近最少访问的节点，也就是链表首部节点first; 
 6. removeEldestEntry() 默认为 false，如果需要让它为 true，需要继承 LinkedHashMap 并重写这个方法，这在实现 LRU 的缓存中特别有用，通过移除最近最少使用的节点，不仅保证了缓存空间足够，而且缓存的都是热点数据;
 
-# WeakHashMap+001
+# WeakHashMap
 1. WeakHashMap 的 Entry 继承自 WeakReference，被 WeakReference关联的对象在下一次垃圾回收时会被回收；
 2. WeakHashMap 主要用来实现缓存，通过使用 WeakHashMap 来引用缓存对象，由 JVM 对这部分缓存进行回收；
 # TreeMap
-1. TreeMap不仅实现了Map接口，还实现了SortedMap接口，因此集合中的映射关系具有一定的顺序(默认按key的自然排序排列)；
+1. TreeMap不仅实现了Map接口，还实现了SortedMap接口，因此集合中的映射关系具有一定的顺序(默认按key的自然顺序排列)；
 2. 但是在添加、删除和定位映射关系时，TreeMap比HashMap性能稍差；
 3. 由于TreeMap实现的Map集合中的映射关系是根据键对象按照一定顺序排列的，因此不允许键对象是null；
 
-# HashMap和HashTable的异同+001
+# HashMap和HashTable的异同
 1. HashMap允许空键空值，Hashtable不允许；
 2. HashMap的方法线程不安全，Hashtable的方法线程安全，HashTable内部的方法由synchronized修饰；
 3. 底层数据结构：JDK1.8以后HashMap在解决哈希冲突时有了较大优化，当链表长度>8且数组容量>=64时，链表会转化为红黑树，以减少搜索时间；HashTable没有这样的机制；
 
-# this和super+001
+# this和super
 1. this用来指向当前实例对象，它的一个重要作用就是用来区分对象的成员变量与方法的形参（当一个方法的形参与成员变量名字相同时，就会覆盖成员变量）；
 2. super可以用来访问离自己最近的父类的成员变量和方法，当子类的成员变量或方法与父类有相同名字时就会覆盖父类成员变量或方法，要想访问父类成员变量或方法只能通过super关键字来访问；
 3. 子类每个构造方法中均隐式调用super()，显式调用父类构造super([参数])会覆盖默认的super() ；
@@ -208,18 +202,18 @@
 5. this和super均不可以在static环境中使用;
 6. 从本质上讲，this是一个指向本对象的指针, 而super是一个Java关键字；
 
-# ArrayList与Vector+001
+# ArrayList与Vector
 1. 都是基于数组实现的动态数组；
 2. Vector线程安全，在可能涉及到线程不安全的操作上都进行了synchronized修饰，但性能不如ArrayList； ArrayList线程不安全，但性能优于Vector，单线程下建议使用；
 
 # 限定通配符与非限定通配符
 1. 限定通配符对类型进行了限制，有两种：1.1<? extends T>类型必须是T或T的子类1.2<? super T>类型必须是T或T的父类；
 2. 非限定通配符：< T >是任意类型；
-# PECS原则+001
+# PECS原则
 1. Producer Extends Consumer Super；
 2. 如果需要一个只读List，用来produce T，那么使用<? extends T>，只能向外提供(get)元素, 而不能作为向外获取(add)元素；
 3. 如果需要一个只写List，用来consume T，那么使用<? super T> ，只能向外获取(add)元素, 而不能向外提供(get)元素；
-# Comparable与Comparator+001
+# Comparable与Comparator
 1. 1.1 Comparable对实现它的类的对象进行比较（需要implements Comparable< T >）1.2 只能在类中重写compareTo(T t)一次，不能经常修改类的代码实现自己想要的排序；1.3 实现此接口的类的对象列表（或对象数组）可以通过Collections.sort（或Arrays.sort）进行排序；
 2. 2.1 Comparator对某个类的对象进行比较（不需要implements）2.2 将Comparator匿名内部类对象传递给sort方法（Collections.sort或 Arrays.sort），重写compare(T t1,T t2)，从而在排序上实现灵活精准控制；
 

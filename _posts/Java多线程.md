@@ -3,15 +3,15 @@
 1. 并行：在同一时刻，有多条指令在多个处理器上同时执行；
 2. 并发：在同一时刻，只能有一条指令执行，但多个进程指令被快速轮转，使得在宏观上具有多个进程同时执行的效果；
 
-# Java线程的7种状态+001
+# Java线程的7种状态
 
 1. 新建状态(New)：通过实现Runnable接口或继承Thread类，new一个线程实例后，线程就进入了新建状态；
-2. 就绪状态(Ready)：线程对象创建成功后，调用该线程的start()函数，线程进入就绪状态，该状态的线程等待获取CPU时间片;
-3. 运行状态(Running)：线程获取到了CPU时间片，正在运行自己的代码，当时间片用完或调用了yield()函数，线程回到就绪状态；
-4. 等待状态(Waiting)：1 运行状态的线程执行wait()、join()、LockSupport.park()，将进入等待状态，其中wait()和join()会令JVM把该线程放入锁等待队列，LockSupport.park()阻塞当前线程的执行，但不会释放当前线程占有的锁资源；2 等待状态的线程不会被分配CPU时间片，等待被主动唤醒，否则一直处于等待状态；2 唤醒：通过notify()、notifyAll()、join线程执行完毕，会唤醒锁等待队列中的线程，出队的线程回到就绪状态；另一个线程调用执行LockSupport.unpark(t)唤醒指定线程，该线程回到就绪状态；
-5. 超时等待状态(Timed Waiting)：1 与等待状态的区别是：超时等待状态的线程到达指定时间后会自动唤醒；2 以下函数会进入超时等待状态：wait(long)、join(long)、sleep(long)、LockSupport.parkUtil(long)，其中wait(long)、join(long)函数会令JVM把线程放入锁等待队列；3 唤醒：超时时间到了，或通过notify()、notifyAll()、join线程执行完毕，会唤醒锁等待队列中的线程，出队的线程回到就绪状态；非锁等待队列中的线程等超时了就回到就绪状态；
-6. 阻塞状态(Blocked)：运行状态的线程获取同步锁失败或发出IO请求，进入阻塞状态，如果是获取同步锁失败则JVM将该线程放入锁的同步队列;
-7. 终止状态(Terminated)：线程执行结束或执行过程中因异常意外终止就进入了终止状态，线程一旦终止就不能复生，这是不可逆的过程；
+2. 就绪状态(Ready)：线程对象创建成功后，调用该线程的start()函数，线程进入就绪状态，该状态的线程等待获取CPU时间片；运行状态下时间片用完或调用了yield()函数，线程回到就绪状态；
+3. 运行状态(Running)：线程获取到了CPU时间片，正在运行自己的代码；
+4. 等待状态(Waiting)：1 运行状态的线程执行wait()、t.join()、LockSupport.park()等，将进入等待状态，其中wait()和t.join()会令JVM把该线程放入锁等待队列，LockSupport.park()不会释放当前线程占有的锁资源；2 等待状态的线程不会被分配CPU时间片，等待被主动唤醒，否则一直处于等待状态；2 唤醒：通过notify()、notifyAll()、调用join的线程t执行完毕，会唤醒锁等待队列中的线程，出队的线程回到就绪状态；另一个线程调用执行LockSupport.unpark(t)唤醒指定线程，该线程回到就绪状态；
+5. 超时等待状态(Timed Waiting)：1 与等待状态的区别是：超时等待状态的线程到达指定时间后会自动唤醒；2 以下函数会进入超时等待状态：wait(long)、t.join(long)、sleep(long)、LockSupport.parkUtil(long)，其中wait(long)、t.join(long)会令JVM把线程放入锁等待队列；3 唤醒：超时时间到了，或通过notify()、notifyAll()、调用join的线程t执行完毕，会唤醒锁等待队列中的线程，出队的线程回到就绪状态；非锁等待队列中的线程等超时了就回到就绪状态；
+6. 阻塞状态(Blocked)：运行状态的线程获取同步锁失败或发出IO请求，进入阻塞状态，如果是获取同步锁失败则JVM将该线程放入锁同步队列;
+7. 终止状态(Terminated)：线程执行结束或执行过程中因异常意外终止就进入终止状态，线程一旦终止就不能复生，这是不可逆的过程；
 
 ## 一张图总结Java线程状态
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210705150218127.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3NjMTc5,size_16,color_FFFFFF,t_70)
@@ -40,11 +40,15 @@
 1. execute() 用于提交没有返回值的任务；
 2. submit() 用于提交有返回值的任务。线程池会返回⼀个 Future 类型的对象，可以通过 Future.get() 来获取返回值；
 
+# Runnable和Callable的区别
+1. Callable 的实现方法是 call()，Runnable 的实现方法是 run()；
+2. Callable 任务执行后有返回值。Callable 与 Future 配合使用，运行 Callable 任务和获取一个 Future 对象 Future 表示异步计算后的结果；Runnable 任务执行后是没有返回值的；
+3. Callable 的 call() 方法可以抛出异常，Runnable 的 run() 方法不能抛出异常；
 # 如何创建线程池
 
 ## 方法1：通过Executor框架的工具类Executors来实现
 1. newFixedThreadPool（固定大小的线程池）：如果任务数量大于等于线程池中线程的数量，则新提交的任务将在阻塞队列中排队，直到有可用的线程资源；
-2. newSingleThreadPool（单个线程的线程池）：1 确保池中永远有且只有一个可用的线程；2 在该线程停止或发生异常时，会创建一个新线程代替该线程继续执行任务；
+2. newSingleThreadExecutor（单个线程的线程池）：1 确保池中永远有且只有一个可用的线程；2 在该线程停止或发生异常时，会创建一个新线程代替该线程继续执行任务；
 3. newCachedThreadPool（可缓存的线程池）：1 提交新任务时如果有可重用的线程，则重用它们，否则创建一个新线程并将其添加到线程池中；2 线程池的keepAliveTime默认60秒，超过60秒未被利用线程会被终止并从缓存中移除，因此在没有线程任务运行时，newCachedThreadPool不会占用系统资源；3 在有执行时间很短的大量任务需要执行的情况下，newCachedThreadPool能很好地复用线程资源来提高运行效率；
 4. newScheduledThreadPool（可做任务调度的线程池）：可定时调度，可设置在给定延迟时间后执行或定期执行某个线程任务；
 5. newWorkStealingPool（足够大小的线程池)：1 用于创建持有足够数量线程的线程池来达到快速运算的目的；2 JDK根据当前的运行需求向操作系统申请足够多的线程；
@@ -57,7 +61,7 @@ ExecutorService executor = Executors.newSingleThreadExecutor();
 
 ## 方式2：通过ThreadPoolExecutor构造方法创建
 《阿里巴巴Java开发手册》中强制线程池不允许使用 Executors 去创建，而是通过ThreadPoolExecutor 的方式，这样的处理方式一是规避资源耗尽的风险，二是可以更加明确线程池的运行规则。
-Executors 返回线程池对象的弊端如下：1. newFixedThreadPool 和 newSingleThreadPool ： 允许请求的队列长度为 Integer.MAX_VALUE，可能堆积大量的请求，从而导致OOM(OutOfMemoryError)；2. newCachedThreadPool 和 newScheduledThreadPool ： 允许创建的线程数量为 Integer.MAX_VALUE，可能会创建大量线程，从而导致OOM；![在这里插入图片描述](https://img-blog.csdnimg.cn/202107061021518.png)
+Executors 返回线程池对象的弊端如下：1. newFixedThreadPool 和 newSingleThreadExecutor ： 允许请求的队列长度为 Integer.MAX_VALUE，可能堆积大量的请求，从而导致OOM(OutOfMemoryError)；2. newCachedThreadPool 和 newScheduledThreadPool ： 允许创建的线程数量为 Integer.MAX_VALUE，可能会创建大量线程，从而导致OOM；![在这里插入图片描述](https://img-blog.csdnimg.cn/202107061021518.png)
 以上是ThreadPoolExecutor类提供的4个构造方法，下面分析最长的那个，其他三个采用默认参数：
 
 ```java
@@ -232,7 +236,7 @@ Java的Atomic原子类都放在`java.util.concurrent.atomic`包下
 
 3. 引用类型：使用原子的方式操作引用变量
 	1. AtomicReference：引用类型原子类；
-	2. AtomicStampedReference：原子更新带有版本号的引用类型。该类将整数值与引用关联起来，可用于解决原子的更新数据和数据的版本号，可以解决使用CAS进行原子更新时可能出现的ABA问题（由于 CAS 设计机制就是获取某两个时刻(初始预期值和当前值)变量值，并进行比较更新，所以说如果在获取初始预期值和当前内存值这段时间间隔内，变量值由 A 变为 B 再变为 A，那么对于 CAS 来说是不可感知的，但实际上变量已经发生了变化（即ABA问题）。解决办法是在每次获取时加版本号，并且每次更新对版本号 +1，这样当发生 ABA 问题时通过版本号可以得知变量被改动过；
+	2. AtomicStampedReference：原子更新带有版本号的引用类型。该类将整数值与引用关联起来，可用于解决原子的更新数据和数据的版本号，可以解决使用CAS进行原子更新时可能出现的ABA问题（由于 CAS 设计机制就是获取某两个时刻变量值(初始预期值和当前值)，并进行比较更新，所以说如果在获取初始预期值和当前内存值这段时间间隔内，变量值由 A 变为 B 再变为 A，那么对于 CAS 来说是不可感知的，但实际上变量已经发生了变化（即ABA问题）。解决办法是加版本号，每次更新对版本号 +1，这样当发生 ABA 问题时通过版本号可以得知变量被改动过；
 
 ## AtomicInteger类的使用
  - public final int get()：获取当前的值
@@ -251,7 +255,7 @@ Java的Atomic原子类都放在`java.util.concurrent.atomic`包下
 # CAS和AQS
 ## CAS
 1. CAS：在数据更新的时候判断一下在此期间是否有其他线程修改了这个数据，如果修改了则不更新，而是返回当前数据，再重新执行一次任务+CAS这个过程；
-2. 由于 CAS 设计机制就是获取某两个时刻(初始预期值和当前值)变量值，并进行比较更新，所以说如果在获取初始预期值和当前内存值这段时间间隔内，变量值由 A 变为 B 再变为 A，那么对于 CAS 来说是不可感知的，但实际上变量已经发生了变化（即ABA问题）。解决办法是在每次获取时加版本号，并且每次更新对版本号 +1，这样当发生 ABA 问题时通过版本号可以得知变量被改动过；
+2. 由于 CAS 设计机制就是获取某两个时刻变量值(初始预期值和当前值)，并进行比较更新，所以说如果在获取初始预期值和当前内存值这段时间间隔内，变量值由 A 变为 B 再变为 A，那么对于 CAS 来说是不可感知的，但实际上变量已经发生了变化（即ABA问题）。解决办法是加版本号，每次更新对版本号 +1，这样当发生 ABA 问题时通过版本号可以得知变量被改动过；
 
 ## AQS
 1. AQS（Abstract Queued Synchronized，抽象的队列同步器），定义了一套多线程访问共享资源的同步器框架，许多同步类实现都依赖于它，如常用的ReentrantLock、ReentrantReadWriteLock、Semaphore、CountDownLatch等；
@@ -320,7 +324,7 @@ public class Singleton {
     private volatile static Singleton instance;  
     private Singleton (){}  
     public static Singleton getSingleton() {  
-    	//先判断对象是否已经实例过，没有实例化过才进⼊加锁代码
+    	//先判断对象是否已经实例化过，没有实例化过才进⼊加锁代码
 	    if (instance == null) {  
 	    	//类对象加锁
 	        synchronized (Singleton.class) {  
@@ -347,7 +351,7 @@ instance采⽤ volatile 关键字修饰是很有必要的，instance = new Singl
 2. 同时还引进了自旋锁、锁消除、锁粗化等技术来减少锁操作的开销；
 ## synchronized和ReentrantLock
 1. **两者都是可重入锁**：可重入锁也叫递归锁，是指一个线程在外层方法获取了锁，进入内层方法会自动获取锁（比如一个递归函数里有加锁操作，递归过程中这个锁不会阻塞当前线程）；
-2. **synchronized依赖于JVM而ReentrantLock依赖于 API**：synchronized是依赖于JVM实现的，JDK1.6为synchronized 关键字进行了很多优化，但是这些优化都是在虚拟机层面实现的；ReentrantLock是JDK层面实现的（也就是 API 层面，需要 lock() 和 unlock() 方法配合try/finally 语句块来完成）；
+2. **synchronized依赖于JVM而ReentrantLock依赖于 API**：synchronized是依赖于JVM实现的，JDK1.6为synchronized 关键字进行了很多优化，但是这些优化都是在JVM层面实现的；ReentrantLock是在JDK层面实现的（也就是 API 层面，需要 lock() 和 unlock() 方法配合try/finally 语句块来完成）；
 3. **ReentrantLock比synchronized增加了一些高级功能**：1 等待可中断：正在等待的线程可以选择放弃等待，改为处理其他事情；2 可实现公平锁：可以指定是公平锁还是非公平锁，而synchronized只能是非公平锁，公平锁就是指先等待的线程先获得锁；3 可实现选择性通知：synchronized关键字与wait()和notify()/notifyAll()方法相结合可以实现等待唤醒机制，ReentrantLock类的等待唤醒机制需要借助Condition接口，Condition具有很好的灵活性，比如可以实现多路通知功能也就是在⼀个Lock对象中可以创建多个Condition实例（即对象监视器），线程对象可以注册在指定的Condition中，从而可以有选择性的进行线程通知，在调度线程上更加灵活。 在使用notify()/notifyAll()方法进行通知时，被通知的线程是由 JVM 选择的，用ReentrantLock类结合Condition实例可以实现“选择性通知” ；synchronized关键字就相当于整个Lock对象中只有⼀个Condition实例，所有的线程都注册在它⼀个身上。如果执行notifyAll()方法的话就会通知所有处于等待状态的线程，这样会造成很大的效率问题，而Condition实例的signalAll()方法只会唤醒注册在该Condition实例中的所有等待线程；
 4. 性能已不是选择标准；
 
@@ -400,6 +404,12 @@ instance采用volatile 关键字修饰是很有必要的，instance = new Single
 
 但是由于 JVM 具有指令重排的特性，执行顺序有可能变成 1->3->2。指令重排在单线程环境下不会出现问题，但是在多线程环境下会导致⼀个线程获得还没有初始化的实例。例如，线程 T1 执行了 1 和 3，此时 T2 调用getSingleton() 后发现 instance不为空，因此返回instance，但此时 instance还未被初始化。
 
+
+## 4 比较
+1. volatile 是 JVM 轻量级的同步机制，所以性能比 synchronized 要好；
+2. volatile 修饰变量，synchronized 修饰代码块或者方法；
+3. 多线程访问 volatile 不会出现阻塞，synchronized 会出现阻塞；
+4. volatile 不能保证原子性，synchroinzed 能保证原子性；
 # ReentrantLock
 1. ReentrantLock是一个可重入的独占锁，通过AQS（Abstract Queued Synchronized，抽象的队列同步器）来实现锁的获取与释放；
 2. ReentrantLock支持公平锁和非公平锁的实现，通过在构造函数ReentrantLock(boolean fair)中传递不同的参数来定义不同类型的锁，默认非公平锁；
@@ -411,11 +421,7 @@ instance采用volatile 关键字修饰是很有必要的，instance = new Single
 4. 是否传参：sleep()必须传参，参数就是休眠时间；wait()可传参也可不传参，传参就是等待参数时间后苏醒，不传参无限等待;
 
 # sleep()和yield()的区别
-1. sleep()：
-	1.1 调用sleep()会让当前线程从Running进入Timed Waiting状态；
-	1.2 其他线程可以使用interrupt方法打断正在睡眠的线程，这时sleep()会抛出InterruptedException；
-	1.3 睡眠结束后的线程未必会立刻得到执行；
-	1.4 建议用TimeUnit的sleep()代替Thread的sleep()来获得更好的可读性；
+1. sleep()：调用sleep()会让当前线程从Running进入Timed Waiting状态；
 
 2. yield()：
 	2.1 调用yield()会让当前线程从Running进入Runnable状态，然后调度执行其它线程；
@@ -474,7 +480,7 @@ Lock lock = new ReentrantLock(false);
 1. 自旋锁认为：如果持有锁的线程能在很短的时间内释放锁资源，那么那些等待竞争锁的线程就不需要做内核态和用户态之间的切换进入阻塞、挂起状态，只需等一等（即自旋），在持有锁的线程释放锁后即可立即获取锁，这样就避免了线程在内核态和用户态之间的切换上导致的锁时间消耗；
 2. 线程在自旋时会占用CPU，长时间自旋获取不到锁就会造成CPU的浪费，因此自旋锁不适合锁占用时间比较长的并发情况；
 3. 适合占用锁的时间非常短或锁竞争不激烈的代码块，对性能会有大幅度提升；
-4. 在JDK1.6又引入了自适应自旋，这个就比较智能了，自旋时间不再固定，由前一次在同一个锁上的自旋时间以及锁的拥有者的状态来决定。如果虚拟机认为这次自旋也很有可能再次成功那就会自旋较多的时间，如果自旋很少成功，那以后可能就直接省略掉自旋过程，避免浪费CPU资源；
+4. 在JDK1.6又引入了自适应自旋，这个就比较智能了，自旋时间不再固定，由前一次在同一个锁上的自旋时间以及锁的拥有者的状态来决定。如果JVM认为这次自旋也很有可能再次成功那就会自旋较多的时间，如果自旋很少成功，那以后可能就直接省略掉自旋过程，避免浪费CPU资源；
 
 ## 分段锁
 1. 分段锁并非实际的锁，用于将数据分段并在每个分段上都单独加锁，把锁进一步细粒度化，以提高并发效率；
@@ -482,7 +488,7 @@ Lock lock = new ReentrantLock(false);
 
 ## 锁升级：无锁-偏向锁-轻量级锁-重量级锁
 1. JDK1.6为了提升性能减少获取锁和释放锁带来的消耗，引入了4种锁的状态：无锁、偏向锁、轻量级锁和重量级锁，会随着多线程的竞争情况逐渐升级，但不能降级；
-2. 无锁：即乐观锁；
+2. 无锁：即乐观锁：不锁住资源，多个线程中只有一个能修改资源成功，其它线程会重试；
 3. 偏向锁：用于在某个线程获取锁后，消除这个线程锁重入的开销，看起来好像这个线程得到了该锁的偏向；偏向锁的实现是通过控制对象`Mark Word`的标志位来实现的，如果当前是可偏向状态，需要进一步判断对象头存储的线程ID是否与当前线程ID一致，如果一致则直接进入；
 4. 轻量级锁：当线程竞争变得比较激烈时，偏向锁会升级为轻量级锁，即线程通过自旋等待其他线程释放锁；
 5. 重量级锁：如果线程竞争进一步加剧，比如线程的自旋超过一定次数，或者一个线程持有锁、一个线程自旋、又来第三个线程访问时，轻量级锁就会升级为重量级锁，重量级锁会使除了此时拥有锁的线程以外的线程都阻塞，重量级锁其实就是互斥锁了；Java中的synchronized关键字内部实现原理就是锁升级的过程：无锁-偏向锁-轻量级锁-重量级锁；
@@ -545,4 +551,13 @@ public synchronized StringBuffer append(String str) {
 ## 一张图总结Java各种锁+1
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210628141225953.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3NjMTc5,size_16,color_FFFFFF,t_70)
 
+# ThreadLocal
+ThreadLocal提供了线程本地变量，当创建了一个ThreadLocal变量，那么访问这个变量的每个线程都会有这个变量的一个本地副本。当多个线程操作这个变量时，实际操作的是自己本地内存里面的变量，从而避免了线程安全问题。
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/fddcbdfc46fb404691cecde5957a5dc7.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3NjMTc5,size_16,color_FFFFFF,t_70)
+1. Thread类中有一个ThreadLocalMap类型的变量threadLocals，ThreadLocalMap是一个定制化的HashMap。在默认情况下，每个线程中的这个变量为null，只有当前线程第一次调用ThreadLocal的set或者get方法时才会创建它；
+2. 其实每个线程的本地变量不是存放在ThreadLocal实例里面，而是存放在调用线程的threadLocals变量里面。也就是说，ThreadLocal类型的本地变量存放在具体的线程内存空间中；
+3. ThreadLocal就是一个工具壳，它通过set方法把value值放入调用线程的threadLocals里面并存放起来，其 Key 是 ThreadLocal 对象，Value是 Entry 对象。当调用线程调用它的get方法时，再从当前线程的threadLocals变量里面将其拿出来使用。Thread里面的threadLocals之所以被设计为map结构？是因为每个线程可以关联多个ThreadLocal变量；
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/38189a8bb8de484a87ad6f851c044679.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3NjMTc5,size_16,color_FFFFFF,t_70)
 
