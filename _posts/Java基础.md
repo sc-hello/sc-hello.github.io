@@ -3,7 +3,7 @@
 1. 都是实现多态的方式；
 2. 重载实现编译时的多态性，重写实现运行时的多态性；
 3. 重载发生在同一个类中，方法名相同，参数列表不同，与返回值类型、权限修饰、抛出异常无关（比如其他相同返回值类型不同，不能表示重载而且报错）；
-4. 重写发生在父类和子类之间，方法名、参数列表相同，方法修饰符权限大于等于父类、返回值类型小于等于父类、抛出异常小于等于父类；
+4. 重写发生在父类和子类之间，方法名、参数列表相同，方法修饰符权限大于等于父类、返回值类型可以不同但必须是被重写方法返回值类型的子类、抛出异常小于等于父类；
 # ==和equals()的区别
 1. ==：分两种情况：基本数据类型==比较的是值，引用数据类型==比较的是地址;
 2. equals()只针对引用类型，也分两种情况：2.1类没有重写equals()方法，比较的是地址，例如StringBuilder类、StringBuffer类；2.2类重写了equals()方法，比较的是对象内容，例如String类、基本类型包装类；
@@ -48,7 +48,7 @@
 
 ## 什么时候用抽象类，什么时候用接口
 0.  分析对象提炼内部共性时形成抽象类，提供调用功能扩充功能时形成接口；
-1. 抽象类和其子类是是不是的关系（is-a）。例如：程序员和项目经理都是员工；
+1. 抽象类和其子类是是不是的关系（is-a）。例如：程序员和产品经理都是员工；
 2. 接口和其子类是有没有的关系(has-a)。例如：鸟和飞机都有飞的特性；
 # Java实例化对象时的初始化顺序
 1. 父类静态成员和静态初始化块，按在代码中出现的顺序依次执行；
@@ -134,7 +134,7 @@
 2. Class.forName(className)得到的是类加载过程第五阶段“初始化”后的class对象；
 
 # 什么是反射机制
-1. 指在运行状态中，对任意一个类，都能够知道这个类的所有属性和方法;对任意一个对象，都能够调用这个对象的所有属性和方法；
+1. 指在运行状态中，对任意一个类，都能够知道这个类的所有属性和方法；对任意一个对象，都能够调用这个对象的所有属性和方法；
 2. 作用：2.1 运行时检查类的属性和方法2.2 运行时检查对象的类型2.3 运行时任意调用对象的方法2.4 运行时任意构造一个类的对象；
 3. 使用：3.1 java.lang.reflect包中的三个类（1Field:成员变量 2Method:成员方法 3Constructor:构造方法）3.2对public域的方法:getField、getMethod、getConstructor 3.3对所有域的方法:getDeclaredField、getDeclaredMethod、getDeclaredConstructor 3.4利用反射访问私有属性:使用setAccessible(true)；
 4. 不足：性能是一个问题，反射相当于一系列解释操作，通知JVM要做什么，性能比直接的Java慢很多；
@@ -172,7 +172,7 @@
 # ConcurrentHashMap
 1. ConcurrentHashMap和HashMap的实现方式类似，不同的是它采用分段锁的思想支持并发操作，因此是线程安全的；
 2. 如果为了线程安全对整个HashMap加锁，同一时间只能有一个线程可以操作HashMap，效率不高；而ConcurrentHashMap在内部细分为若干个小的HashMap，即Segment，默认16个，对每个Segment单独加锁，提高了并发度；
-3. 实现：3.1 ConcurrentHashMap内部包含了一个Segment数组，Segment和HashMap类似，是数组和链表结构；3.2 每个Segment包含并守护一个HashEntry数组，HashEntry是链表结构，在对HashEntry数组里的数据进行修改时，必须首先获得它对应的Segment锁；3.3 在操作ConcurrentHashMap时，如果需要在其中put一个新的数据，并不是将整个ConcurrentHashMap加锁，而是先根据hashcode查询该数据被存放在哪个Segment，然后对该Segment加锁并完成put操作；3.4 在多线程环境下，如果多个线程同时执行put操作，则只要加入的数据被存放在不同的Segment中，在线程间就可以做到并行的线程安全；
+3. 实现：3.1 ConcurrentHashMap内部包含了一个Segment数组，Segment和HashMap类似，是数组+链表结构；3.2 每个Segment包含并守护一个HashEntry数组，HashEntry是链表结构，在对HashEntry数组里的数据进行修改时，必须首先获得它对应的Segment锁；3.3 在操作ConcurrentHashMap时，如果需要在其中put一个新的数据，并不是将整个ConcurrentHashMap加锁，而是先根据hashcode查询该数据被存放在哪个Segment，然后对该Segment加锁并完成put操作；3.4 在多线程环境下，如果多个线程同时执行put操作，则只要加入的数据被存放在不同的Segment中，在线程间就可以做到并行的线程安全；
 # LinkedHashMap
 1. 继承自 HashMap;
 2. 内部维护了一个双向链表，用来维护插入顺序或 LRU 顺序；
@@ -190,8 +190,8 @@
 3. 由于TreeMap实现的Map集合中的映射关系是根据键对象按照一定顺序排列的，因此不允许键对象是null；
 
 # HashMap和HashTable的异同
-1. HashMap允许空键空值，Hashtable不允许；
-2. HashMap的方法线程不安全，Hashtable的方法线程安全，HashTable内部的方法由synchronized修饰；
+1. HashMap允许空键空值，HashTable不允许；
+2. HashMap的方法线程不安全，HashTable的方法线程安全，HashTable内部的方法由synchronized修饰；
 3. 底层数据结构：JDK1.8以后HashMap在解决哈希冲突时有了较大优化，当链表长度>8且数组容量>=64时，链表会转化为红黑树，以减少搜索时间；HashTable没有这样的机制；
 
 # this和super
